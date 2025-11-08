@@ -1,4 +1,4 @@
-FROM node:25
+FROM node:22
 WORKDIR /app
 COPY leafDex_Web/package.json ./
 RUN npm install

@@ -20,7 +20,7 @@ const formClasses = {
   googleButton: 'btn btn-outline w-full gap-3',
 };
 
-const LoginPage: React.FC = () => {
+export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

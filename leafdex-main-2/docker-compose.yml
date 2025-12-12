@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod # Or your main Dockerfile
+    container_name: leafdex-app
+    ports:
+      - "5000:3000"
+    depends_on:
+      - db # Ensures the DB starts before the app
+    environment:
+      # These variables are crucial for your app code to connect to the DB
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: 123
+      DB_NAME: user_management
+
+  db:
+    image: mysql:8.0 # Official MySQL image
+    container_name: leafdex-mysql
+    restart: always
+    environment:
+      # Sets the password for the 'root' user (must match DB_PASSWORD above)
+      MYSQL_ROOT_PASSWORD: 123
+      # Optional: Creates this database automatically on first startup
+      MYSQL_DATABASE: user_management
+    ports:
+      # Only expose the port for debugging/setup (optional)
+      - "3306:3306" 
+    volumes:
+      # Persists data outside the container so it's not lost when the container is stopped
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # This runs the SQL script
+
+volumes:
+  db_data:

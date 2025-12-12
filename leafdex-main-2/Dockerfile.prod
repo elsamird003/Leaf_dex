@@ -1,0 +1,28 @@
+# --- STAGE 1: Build React ---
+FROM node:22-slim AS build
+WORKDIR /app
+
+COPY leafDex_Web/package.json leafDex_Web/package-lock.json ./
+RUN npm install
+
+COPY leafDex_Web/ .
+RUN npm run build
+
+# --- STAGE 2: Node backend + React build ---
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Install backend dependencies
+COPY package.json package-lock.json ./
+RUN npm install --production
+
+# Copy backend code
+COPY server.js .
+
+# Copy React build into backend
+COPY --from=build /app/dist ./dist
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]

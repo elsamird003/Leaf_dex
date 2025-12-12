@@ -1,4 +1,6 @@
-import React from 'react';
+import { useState } from 'react';
+
+
 import { useNavigate } from 'react-router-dom';
 
 // Shared classes for form elements using DaisyUI semantic classes
@@ -21,6 +23,65 @@ const formClasses = {
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  // State for all form fields
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // State for UI feedback
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+
+    // --- Frontend Validation ---
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // 1. Send registration data to the backend API
+      const response = await fetch("http://localhost:5000/api/register", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // We only send the fields required by the server/database
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await response.json();
+
+      // 2. Handle the server's response
+      if (response.ok) {
+        // Successful registration (HTTP 200-299 status code)
+        setSuccess('Account created successfully! Redirecting to login...');
+        console.log('Registration successful');
+        
+        // Redirect to login page after a short delay
+        setTimeout(() => navigate('/login'), 1500);
+      } else {
+        // Registration failed (e.g., username/email already exists, validation error)
+        console.log('Registration failed', data.message);
+        // Display the error message returned by the server
+        setError(data.message || 'Registration failed. Please try a different username/email.');
+      }
+    } catch (err) {
+      // Handle network errors
+      console.error('Network or system error during registration:', err);
+      setError('Could not connect to the server. Please check your network.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className={formClasses.container}>
@@ -59,49 +120,92 @@ const SignupPage: React.FC = () => {
 
         <div className={formClasses.divider}>or continue with email</div>
 
-        <form className={formClasses.form}>
+        <form onSubmit={handleSubmit} className={formClasses.form}>
+          {/* --- Success/Error Alerts --- */}
+          {error && (
+            <div className="alert alert-error">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>{error}</span>
+            </div>
+          )}
+          {success && (
+            <div className="alert alert-success">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>{success}</span>
+            </div>
+          )}
+
+          {/* --- Username Input --- */}
           <div className={formClasses.inputGroup}>
             <label className="label pb-2">
               <span className={formClasses.label}>Username</span>
             </label>
             <input
               type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className={formClasses.input}
               placeholder="Choose a username"
+              required
             />
           </div>
+          
+          {/* --- Email Input --- */}
           <div className={formClasses.inputGroup}>
             <label className="label">
               <span className={formClasses.label}>Email</span>
             </label>
             <input
               type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className={formClasses.input}
               placeholder="Enter your email"
+              required
             />
           </div>
+          
+          {/* --- Password Input --- */}
           <div className={formClasses.inputGroup}>
             <label className="label">
               <span className={formClasses.label}>Password</span>
             </label>
             <input
               type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className={formClasses.input}
               placeholder="Create a password"
+              required
             />
           </div>
+          
+          {/* --- Confirm Password Input --- */}
           <div className={formClasses.inputGroup}>
             <label className="label">
               <span className={formClasses.label}>Confirm Password</span>
             </label>
             <input
               type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className={formClasses.input}
               placeholder="Confirm your password"
+              required
             />
           </div>
-          <button type="submit" className={formClasses.button}>
-            Create Account
+          
+          {/* --- Submit Button --- */}
+          <button
+            type="submit"
+            className={`${formClasses.button} ${isLoading ? 'loading' : ''}`}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Creating...' : 'Create Account'}
           </button>
         </form>
 

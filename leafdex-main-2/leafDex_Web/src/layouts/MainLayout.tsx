@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/ui/Navbar';
 import { classes } from '../styles/classes';
-
+// import { AuthContext } from '../hooks/authContent';
 const MainLayout = () => {
   return (
     <div className="min-h-screen bg-base-100">

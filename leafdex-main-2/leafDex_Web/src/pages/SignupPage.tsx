@@ -1,13 +1,11 @@
 import { useState } from 'react';
-
-
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth'; // <--- NEW: Import the custom hook
 
 // Shared classes for form elements using DaisyUI semantic classes
 const formClasses = {
-  container:
-    'min-h-screen w-full fixed top-0 left-0 flex items-center justify-center bg-base-300',
-  card: 'card bg-base-200 backdrop-blur-sm w-full max-w-md p-8 mx-4',
+  container:'min-h-screen flex items-center justify-center bg-base-300 py-12',
+  card: 'card bg-base-200 backdrop-blur-sm w-full max-w-sm p-8 mx-4 shadow-xl', // Added shadow-xl for definition
   form: 'form-control w-full space-y-4',
   inputGroup: 'form-control',
   label: 'label-text text-base-content pb-2',
@@ -23,6 +21,9 @@ const formClasses = {
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  // 1. Initialize and destructure the login function
+   const { login } = useAuth();
+  
   // State for all form fields
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -33,7 +34,7 @@ const SignupPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
+    
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -54,7 +55,6 @@ const SignupPage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        // We only send the fields required by the server/database
         body: JSON.stringify({ username, email, password }),
       });
 
@@ -62,20 +62,22 @@ const SignupPage: React.FC = () => {
 
       // 2. Handle the server's response
       if (response.ok) {
-        // Successful registration (HTTP 200-299 status code)
-        setSuccess('Account created successfully! Redirecting to login...');
+        setSuccess('Account created successfully! Redirecting...');
         console.log('Registration successful');
         
-        // Redirect to login page after a short delay
-        setTimeout(() => navigate('/login'), 1500);
+        // --- AUTH LOGIC ADDED ---
+        // 3. Log the user in with the username they just created
+        login({ username: username });
+        
+        // 4. Redirect to the home page (or wherever the main app is)
+        setTimeout(() => navigate('/'), 1500); 
+        // --- END AUTH LOGIC ---
+
       } else {
-        // Registration failed (e.g., username/email already exists, validation error)
         console.log('Registration failed', data.message);
-        // Display the error message returned by the server
         setError(data.message || 'Registration failed. Please try a different username/email.');
       }
     } catch (err) {
-      // Handle network errors
       console.error('Network or system error during registration:', err);
       setError('Could not connect to the server. Please check your network.');
     } finally {

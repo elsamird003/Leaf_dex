@@ -2,7 +2,7 @@
 import './index.css';
 import video from './assets/videoplayback.webm';
 import { classes } from './styles/classes';
-import AboutPage from '../src/pages/AboutPage';
+// import AboutPage from '../src/pages/AboutPage';
 function App() {
   return (
     // Main container with overflow-x-hidden for stability
@@ -65,11 +65,11 @@ function App() {
           </div>
         </div>
 
-        {/* PART B: THE ABOUT SECTION (Screen 2 and beyond) */}
+        {/* PART B: THE ABOUT SECTION (Screen 2 and beyond)
         <div className="bg-white/95 text-base-content py-10 sm:py-20 w-full max-w-full overflow-x-hidden left-0 flex">
             {/* The AboutPage component itself handles its internal responsiveness well */}
-            <AboutPage />
-        </div>
+            {/* <AboutPage /> */}
+        {/* </div> */} 
         
       </div>
     </div>

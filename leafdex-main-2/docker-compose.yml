@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile.prod # Or your main Dockerfile
     container_name: leafdex-app
     ports:
-      - "5000:3000"
+      - "5001:3000"
     depends_on:
       - db # Ensures the DB starts before the app
     environment:

@@ -6,8 +6,8 @@ import resultsStep from '../assets/results-step.svg';
 
 const AboutPage: React.FC = () => {
   return (
-    <div className={classes.container}>
-      <div className={classes.maxWidth}>
+    <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+      <div className="w-full">
         <h1 className={classes.heading1}>About LeafDex</h1>
 
         <div className="prose prose-lg max-w-none">
